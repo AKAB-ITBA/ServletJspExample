@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet(name = "dashboardPage", value = "/dashboard-pages")
+@WebServlet(name = "dashboardPage", value = "/dashboard-page")
 public class LoginPage extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
