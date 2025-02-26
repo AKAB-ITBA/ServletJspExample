@@ -1,0 +1,84 @@
+package com.example.servletjspexample;
+
+import com.example.servletjspexample.dao.UserDao;
+import com.example.servletjspexample.model.User;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServlet;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.List;
+
+@WebServlet(name = "adminPage", value = "/admin-page")
+public class AdminPage extends HttpServlet {
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String result = "";
+        UserDao userDao = new UserDao();
+        String username = "";
+
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("username")) {
+                username = cookie.getValue();
+                break;
+            }
+        }
+        request.setAttribute("usernameField", "Hi " + username + "\n note: bunu nece hell edim?");
+
+        String action = request.getParameter("action");
+        if ("getUsers".equals(action)) {
+            List<User> users = userDao.getAllUsers();
+            if (users.isEmpty()) {
+                request.setAttribute("output", "There is no any users on DB");
+            } else {
+                request.setAttribute("users", users);
+            }
+
+        } else if ("deleteUserById".equals(action)) {
+            long id = Long.parseLong(request.getParameter("userIdDel"));
+            if (userDao.getUserById(id).isEmpty()) {
+                request.setAttribute("output", "There is no users with id - " + id);
+            } else {
+                result = userDao.deleteUserById(id);
+                request.setAttribute("output", result);
+            }
+        } else if ("findUserById".equals(action)) {
+            long id = Long.parseLong(request.getParameter("userId"));
+            List<User> users = userDao.getUserById(id);
+            if (users.isEmpty()) {
+                request.setAttribute("output", "There is no users with id - " + id);
+            } else {
+                request.setAttribute("users", users);
+            }
+        } else if ("confirmPasswordChange".equals(action)) {
+            String currentPassword = request.getParameter("currentPassword");
+            String newPassword = request.getParameter("newPassword");
+            String confirmPassword = request.getParameter("confirmPassword");
+            if (newPassword.equals(confirmPassword)) {
+                if (userDao.getPassByUsername(username).equals(currentPassword)) {
+                    result = userDao.changePass(username, newPassword);
+                    request.setAttribute("output", result);
+                } else {
+                    request.setAttribute("output", "Current password is wrong");
+                }
+            } else {
+                request.setAttribute("output", "New password and confirmation password is not same");
+            }
+
+         /*   request.getSession().setAttribute("passwordChangeResult", result);
+            response.sendRedirect("adminPage.jsp");*/
+        }
+
+        RequestDispatcher dispatcher = request.getRequestDispatcher("adminPage.jsp");
+        dispatcher.forward(request, response);
+    }
+}
+
