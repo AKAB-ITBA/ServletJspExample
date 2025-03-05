@@ -31,7 +31,7 @@ public class AdminPage extends HttpServlet {
                 break;
             }
         }
-        request.setAttribute("usernameField", "Hi " + username + "\n note: bunu nece hell edim?");
+        request.setAttribute("usernameField", "Hi " + username);
 
         String action = request.getParameter("action");
         if ("getUsers".equals(action)) {
@@ -72,12 +72,21 @@ public class AdminPage extends HttpServlet {
             } else {
                 request.setAttribute("output", "New password and confirmation password is not same");
             }
+        } else if ("adminChangePassword".equals(action)) {
+            String passwordToChange = request.getParameter("passwordToChange");
+            String usernameToChange = request.getParameter("usernameToChange");
+                result = userDao.changePass(usernameToChange,passwordToChange);
+                request.setAttribute("output", result);
 
-         /*   request.getSession().setAttribute("passwordChangeResult", result);
-            response.sendRedirect("adminPage.jsp");*/
+        }else if ("adminChangeUsername".equals(action)) {
+            String usernameToChange = request.getParameter("usernameToChange");
+            long id = Long.parseLong(request.getParameter("idForUsernameChange"));
+                result = userDao.changeUsername(id,usernameToChange);
+                request.setAttribute("output", result);
+
         }
 
-        RequestDispatcher dispatcher = request.getRequestDispatcher("adminPage.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("newAdminPage.jsp");
         dispatcher.forward(request, response);
     }
 }

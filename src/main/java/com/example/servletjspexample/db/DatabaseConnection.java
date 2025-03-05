@@ -12,10 +12,6 @@ public class DatabaseConnection implements Closeable {
 
     public Connection getConnection() {
         try {
-            //Class.forName("com.mysql.jdbc.Driver");
-            /*String user = "root";
-            String pass = "";
-            String url = "jdbc:mysql://localhost:3306/testschema";*/
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/customers_db"
                     , "root", "root");
