@@ -204,4 +204,22 @@ public class UserDao extends Database {
         return "Password successfully changed";
     }
 
+    public String changeUsername(long id, String newUsername) {
+        String sql = "UPDATE customers SET username = ? WHERE  id =?";
+        try (DatabaseConnection dbc = new DatabaseConnection()) {
+            conn = dbc.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, newUsername);
+            preparedStatement.setLong(2, id);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeAll();
+        }
+        return "Password successfully changed";
+    }
+
 }

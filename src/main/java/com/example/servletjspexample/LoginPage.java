@@ -33,7 +33,7 @@ public class LoginPage extends HttpServlet {
                 response.addCookie(cookie);
                 /*RequestDispatcher dispatcher = request.getRequestDispatcher("adminPage.jsp");
                 dispatcher.forward(request, response);*/
-                response.sendRedirect("adminPage.jsp");
+                response.sendRedirect("newAdminPage.jsp");
             } else {
                 Cookie cookie = new Cookie("username", loginSign);
                 response.addCookie(cookie);
