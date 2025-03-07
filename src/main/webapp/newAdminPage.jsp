@@ -52,6 +52,11 @@
             outline: none !important;
             border: none !important;
         }
+        .btn-default {
+            color: #333;
+            background-color: #fff;
+            border-color: #ccc;
+        }
 
         .btn {
             display: inline-block;
@@ -88,7 +93,53 @@
             content: "\f1f8";
         }
 
+        .fa-list:before {
+            content: "\f03a";
+        }
+
+        .fa-search:before {
+            content: "\f002";
+        }
+        th {
+            text-align: center;
+        }
+
     </style>
+        <% Cookie[] cookiesForCheck = request.getCookies();
+            boolean isUsernameCookieExist = false;
+            if (cookiesForCheck != null) {
+                for (Cookie cookie : cookiesForCheck) {
+                    if (cookie.getName().equals("username")) {
+                      isUsernameCookieExist = true;
+                      break;
+                    }
+                }
+                if(!isUsernameCookieExist){
+                    response.sendRedirect("/ServletJspExample_war_exploded");
+                    }
+            }
+        %>
+
+    <div class="container">
+        <div class="section">
+            <form action="/ServletJspExample_war_exploded/dashboard-page" method="post">
+                <input type="hidden" name="action" value="logout" required>
+                <button type="submit">Log out</button>
+            </form>
+        </div>
+    </div>
+    <div class="container">
+        <div class="section">
+            <form action="/ServletJspExample_war_exploded/admin-page" method="post">
+                <input type="hidden" name="action" value="searchUser" required>
+                <label for="usernameToSearch"></label>
+                <input type="text" id="usernameToSearch" placeholder="Search user"
+                       name="usernameToSearch" required>
+                <button style="border: none"><a class="btn btn-default" href="javascript:void(0);">
+                    <i class="fa fa-search"></i>
+            </form>
+        </div>
+    </div>
 
     <div class="container">
         <div class="section">
@@ -102,12 +153,11 @@
         </div>
     </div>
 
+
         <%
     List<User> users = (List<User>) request.getAttribute("users");
     if (users != null && !users.isEmpty()) {
 %>
-
-
     <div class="section">
         <table class="table">
             <caption>List of users</caption>
@@ -115,11 +165,9 @@
             <tr>
                 <th scope="col">Id</th>
                 <th scope="col">Username</th>
-                <th scope="col">New Username</th>
                 <th scope="col">Email</th>
-                <th scope="col">Password</th>
-                <th scope="col">Change Password</th>
-                <th scope="col">Actions</th>
+                <th scope="col">Edit profile</th>
+                <th scope="col">Delete user</th>
             </tr>
             </thead>
             <tbody>
@@ -127,7 +175,7 @@
                 <tr>
                     <td><c:out value="${u.getId()}"></c:out></td>
                     <td><c:out value="${u.getUserName()}"></c:out></td>
-                    <td>
+                   <%-- <td>
                         <div class="section">
                             <form action="/ServletJspExample_war_exploded/admin-page" method="post"
                                   onsubmit="return confirm('Are you sure you want to change username?');">
@@ -136,20 +184,17 @@
                                        name="usernameToChange" required>
                                 <input type="hidden" name="idForUsernameChange" value="${u.getId()}">
                                 <button type="submit" class="btn btn-danger">Change</button>
-
                             </form>
                         </div>
-                    </td>
+                    </td>--%>
                     <td><c:out value="${u.getEmail()}"></c:out></td>
-                    <td><c:out value="${u.getPassword()}"></c:out></td>
                     <td>
-                        <form action="/ServletJspExample_war_exploded/admin-page" method="post"
-                              onsubmit="return confirm('Are you sure you want to change password?');">
-                            <input type="hidden" name="action" value="adminChangePassword">
-                            <input type="text" id="passwordToChange" placeholder="Enter new Password"
-                                   name="passwordToChange" required>
-                            <input type="hidden" name="usernameToChange" value="${u.getUserName()}">
-                            <button type="submit" class="btn btn-danger">Change</button>
+                        <form action="/ServletJspExample_war_exploded/edit-page" method="post">
+                            <input type="hidden" name="action" value="editUserProfile">
+                            <input type="hidden" name="userId" value="${u.getId()}">
+                            <button style="border: none"><a class="btn btn-default" href="javascript:void(0);">
+                                <i class="fa fa-list"></i>
+                            </a></button>
                         </form>
                     </td>
                     <td>
