@@ -5,11 +5,8 @@ import com.example.servletjspexample.model.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
-
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -35,28 +32,34 @@ public class AdminPage extends HttpServlet {
 
         String action = request.getParameter("action");
         if ("getUsers".equals(action)) {
-            List<User> users = userDao.getAllUsers();
-            if (users.isEmpty()) {
-                request.setAttribute("output", "There is no any users on DB");
-            } else {
-                request.setAttribute("users", users);
-            }
+                List<User> users = userDao.getAllUsers();
+                if (users.isEmpty()) {
+                    request.setAttribute("output", "There is no any users on DB");
+                } else {
+                    request.setAttribute("users", users);
+                }
 
         } else if ("deleteUserById".equals(action)) {
             long id = Long.parseLong(request.getParameter("userIdDel"));
-            if (userDao.getUserById(id).isEmpty()) {
+            if (userDao.getUserById(id) !=null) {
                 request.setAttribute("output", "There is no users with id - " + id);
             } else {
-                result = userDao.deleteUserById(id);
-                request.setAttribute("output", result);
+                userDao.deleteUserById(id);
+                List<User> updatedUsers = userDao.getAllUsers();
+                if (updatedUsers.isEmpty()) {
+                    request.setAttribute("output", "There is no any users on DB");
+                } else {
+                    request.setAttribute("users", updatedUsers);
+                }
+
             }
         } else if ("findUserById".equals(action)) {
             long id = Long.parseLong(request.getParameter("userId"));
-            List<User> users = userDao.getUserById(id);
-            if (users.isEmpty()) {
+            User user = userDao.getUserById(id);
+            if (user !=null) {
                 request.setAttribute("output", "There is no users with id - " + id);
             } else {
-                request.setAttribute("users", users);
+                request.setAttribute("users", user);
             }
         } else if ("confirmPasswordChange".equals(action)) {
             String currentPassword = request.getParameter("currentPassword");
@@ -75,17 +78,22 @@ public class AdminPage extends HttpServlet {
         } else if ("adminChangePassword".equals(action)) {
             String passwordToChange = request.getParameter("passwordToChange");
             String usernameToChange = request.getParameter("usernameToChange");
-                result = userDao.changePass(usernameToChange,passwordToChange);
-                request.setAttribute("output", result);
+            result = userDao.changePass(usernameToChange, passwordToChange);
+            request.setAttribute("output", result);
 
-        }else if ("adminChangeUsername".equals(action)) {
+        } else if ("adminChangeUsername".equals(action)) {
             String usernameToChange = request.getParameter("usernameToChange");
             long id = Long.parseLong(request.getParameter("idForUsernameChange"));
-                result = userDao.changeUsername(id,usernameToChange);
-                request.setAttribute("output", result);
+            result = userDao.changeUsername(id, usernameToChange);
+            request.setAttribute("output", result);
+        } else if ("searchUser".equals(action)) {
+            String users = request.getParameter("usernameToSearch");
+            List<User> usersFromSearch = userDao.searchUser(users);
 
+           if (!usersFromSearch.isEmpty()) {
+               request.setAttribute("users", usersFromSearch);
+            }
         }
-
         RequestDispatcher dispatcher = request.getRequestDispatcher("newAdminPage.jsp");
         dispatcher.forward(request, response);
     }

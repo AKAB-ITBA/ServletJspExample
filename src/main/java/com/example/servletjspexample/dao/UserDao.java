@@ -58,21 +58,19 @@ public class UserDao extends Database {
         return "User with id - " + id + " added";
     }
 
-    public List<User> getUserById(long id) {
+    public User getUserById(long id) {
         String sql = "select * from customers where id = " + id;
-        List<User> users = new ArrayList<>();
+        User user = new User();
         try (DatabaseConnection dbc = new DatabaseConnection()) {
             conn = dbc.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                User user = new User();
+
                 user.setId(resultSet.getLong(1));
                 user.setUserName(resultSet.getString(2));
                 user.setEmail(resultSet.getString(3));
                 user.setPassword(resultSet.getString(4));
-                users.add(user);
-                return users;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -81,7 +79,7 @@ public class UserDao extends Database {
         } finally {
             closeAll();
         }
-        return Collections.emptyList();
+        return user;
     }
 
     public String deleteUserById(long id) {
@@ -186,7 +184,7 @@ public class UserDao extends Database {
 
     }
 
-    public String changePass(String username, String newPassword){
+    public String changePass(String username, String newPassword) {
         String sql = "UPDATE customers SET password = ? WHERE  username =?";
         try (DatabaseConnection dbc = new DatabaseConnection()) {
             conn = dbc.getConnection();
@@ -219,7 +217,50 @@ public class UserDao extends Database {
         } finally {
             closeAll();
         }
-        return "Password successfully changed";
+        return "Username successfully changed";
+    }
+
+    public String changeEmail(long id, String newEmail) {
+        String sql = "UPDATE customers SET email = ? WHERE  id =?";
+        try (DatabaseConnection dbc = new DatabaseConnection()) {
+            conn = dbc.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, newEmail);
+            preparedStatement.setLong(2, id);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeAll();
+        }
+        return "Email successfully changed";
+    }
+
+    public List<User> searchUser(String username) {
+        String sql = "SELECT * FROM customers WHERE username LIKE ?";
+        List<User> users = new ArrayList<>();
+
+        try (DatabaseConnection dbc = new DatabaseConnection()) {
+            conn = dbc.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, "%" + username + "%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getLong(1));
+                user.setUserName(resultSet.getString(2));
+                user.setEmail(resultSet.getString(3));
+                //user.setPassword(resultSet.getString(4));
+                users.add(user);
+            }
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return users;
     }
 
 }

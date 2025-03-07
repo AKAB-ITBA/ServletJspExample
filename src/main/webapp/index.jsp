@@ -45,7 +45,6 @@
             <input type="submit" value="Register">
         </form>
 
-        <!-- Qeydiyyat mesajı -->
         <div class="message">
             <%= request.getAttribute("registerMessage") != null ? request.getAttribute("registerMessage") : "" %>
         </div>
